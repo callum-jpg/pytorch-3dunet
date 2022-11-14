@@ -22,7 +22,7 @@ def save_checkpoint(state, is_best, checkpoint_dir):
     """
 
     if not os.path.exists(checkpoint_dir):
-        os.mkdir(checkpoint_dir)
+        os.makedirs(checkpoint_dir)
 
     last_file_path = os.path.join(checkpoint_dir, 'last_checkpoint.pytorch')
     torch.save(state, last_file_path)
