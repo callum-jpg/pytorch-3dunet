@@ -311,6 +311,37 @@ class AbstractLabelToBoundary:
         raise NotImplementedError
 
 
+class PrepareImageAndLabels:
+    """
+    Unsure if this makes sense.
+
+    Basically, trying to create a transform that does not find_boundaries
+    on the input_labels, but still forms tensors of the desired shape.
+    """
+    def __init__(self, ignore_index=None, append_label=False, mode='thick', foreground=False,
+                 **kwargs):
+        self.ignore_index = ignore_index
+        self.append_label = append_label
+        self.mode = mode
+        self.foreground = foreground
+
+    def __call__(self, m):
+        assert m.ndim == 3
+
+        results = []
+        if self.foreground:
+            foreground = (m > 0).astype('uint8')
+            results.append(_recover_ignore_index(foreground, m, self.ignore_index))
+
+        results.append(_recover_ignore_index(m, m, self.ignore_index))
+
+        if self.append_label:
+            # append original input data
+            results.append(m)
+
+        return np.stack(results, axis=0)
+
+
 class StandardLabelToBoundary:
     def __init__(self, ignore_index=None, append_label=False, mode='thick', foreground=False,
                  **kwargs):
